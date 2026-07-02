@@ -27,6 +27,7 @@ cd lab-app/helm
 helm upgrade --install ai101 ./ai101 -f ai101/values-lab2.yaml
 kubectl wait deployment/ai101-agent --for=condition=Available --timeout=120s
 kubectl port-forward svc/ai101-ui 8080:80 &
+kubectl port-forward svc/ai101-agent 8001:8001 &
 ```
 {{% /tab %}}
 {{< /tabs >}}
@@ -82,6 +83,17 @@ message:
 ```bash
 curl -s http://localhost:8001/outbox | jq '.messages'
 ```
+
+{{% notice style="tip" title="If the model narrates instead of acting" %}}
+Small models occasionally describe what they *would* do ("I would send a message
+to Bob...") instead of calling the tool. If the outbox is empty, try the more
+explicit phrasing:
+
+```
+Use the query_employees tool to find who manages Alice Chen,
+then use the send_message tool to tell them Alice will be 15 minutes late today.
+```
+{{% /notice %}}
 
 ---
 

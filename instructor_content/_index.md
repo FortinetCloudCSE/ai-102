@@ -12,7 +12,7 @@ This file is for facilitators only. It is not published to the Hugo site.
 - [ ] `curl http://localhost:8001/health` — shows `"tool_mode": "mcp"`.
 - [ ] Outbox empty: `curl http://localhost:8001/outbox` — `"messages": []`.
 - [ ] Audit log empty: reload the page to start a fresh session.
-- [ ] Lab scripts working: `bash lab-app/scripts/lab1_injection.sh | grep "Override code revealed: True"`.
+- [ ] Lab scripts working: `./lab-app/scripts/lab1_injection.sh | grep "Override code revealed: True"`.
 
 ---
 

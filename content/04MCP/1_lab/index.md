@@ -34,6 +34,7 @@ cd lab-app/helm
 helm upgrade --install ai101 ./ai101 -f ai101/values-lab3.yaml
 kubectl wait deployment/ai101-agent --for=condition=Available --timeout=120s
 kubectl port-forward svc/ai101-ui 8080:80 &
+kubectl port-forward svc/ai101-agent 8001:8001 &
 ```
 {{% /tab %}}
 {{< /tabs >}}

@@ -20,9 +20,10 @@ By the end of this page you should be able to explain:
 
 ## The UI
 
-Lab 2 introduces a browser UI at [http://localhost:8080](http://localhost:8080)
-served by an nginx container. It is a single-page vanilla JS application that
-talks to the agent at `http://localhost:8001` (proxied through nginx as `/api/`).
+Lab 2 introduces a browser UI at `http://localhost:8080` (Docker) or via the
+`kubectl port-forward` command in the K8s deploy tab. It is a single-page
+vanilla JS application that talks to the agent API (proxied through nginx as
+`/api/`).
 
 It has three panels:
 - **Chat** — sends messages to `/chat`, displays the agent's final answer.

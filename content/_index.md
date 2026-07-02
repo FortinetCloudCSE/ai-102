@@ -8,9 +8,10 @@ description: "A hands-on workshop covering LLM inference, autonomous agents, the
 
 ## What is this workshop?
 
-This is a hands-on lab (~3 hours) that takes you from raw LLM inference all the
-way through a realistic agentic security attack, using a purpose-built application
-running entirely on your laptop.
+This is a hands-on lab that takes you from raw LLM inference all the way through
+a realistic agentic security attack, using a purpose-built application running
+entirely on your laptop. The four lab exercises take roughly 2.5 hours; allow
+~3 hours total including setup, a break, and wrap-up.
 
 You will build a small HR assistant backed by a local LLM, connect it to tools,
 extend it with MCP, and then break it deliberately — watching SQL injection,
@@ -60,7 +61,7 @@ policies, and the detection story — using the same attack chain you ran in Lab
 
 ## Prerequisites
 
-See [Setup & Prerequisites](./01intro) for the full list. Short version:
+See [Setup & Prerequisites](./01Intro) for the full list. Short version:
 
 - Docker Engine + Compose v2 (or Kubernetes + Helm 3 for the K8s path)
 - Git and a terminal
