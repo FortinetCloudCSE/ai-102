@@ -18,6 +18,63 @@ By the end of this page you should be able to explain:
 
 ---
 
+## What "agentic" means here — and why it matters now
+
+Module 2 drew the line between an *agent* (a specific system) and *agentic* (a
+property any system can have). It is worth restating that distinction before
+discussing attacks, because the scope of agentic security is wider than most
+people expect.
+
+**You do not need a system labelled "agent" for this attack surface to apply.**
+The relevant question is: does an LLM make decisions that cause code to execute
+or data to move? If yes, the system is agentic and the failure modes in this
+module apply — regardless of what the product team calls it.
+
+| System type | Agentic attack surface? |
+|-------------|------------------------|
+| Plain chatbot (no tools) | Limited — prompt injection affects output only |
+| RAG with read-only retrieval | Partial — indirect injection via retrieved content |
+| Copilot that calls APIs | Yes — confused deputy, tool misuse |
+| Workflow automation driven by LLM | Yes — full attack chain possible |
+| This workshop's HR assistant | Yes — all four failure modes demonstrated |
+
+The attack chain you run in Lab 4 maps to every row below "plain chatbot."
+Engineers building any of those systems need to apply the controls in this
+module. The specific tools (`query_employees`, `send_message`) are stand-ins
+for the real tools in a production system: a ticketing API, a CRM, a cloud
+SDK, an email service.
+
+### Agentic is the new default
+
+Until around 2023, tool-calling was an advanced, opt-in feature used in
+research and specialist applications. By 2025 it is the default mode of AI
+deployment across the enterprise software stack:
+
+- **Microsoft 365 Copilot** reads and writes email, calendar, and documents on
+  behalf of users across the entire organisation.
+- **GitHub Copilot Workspace** reads repositories, proposes changes, and opens
+  pull requests autonomously.
+- **Salesforce Agentforce** queries CRM data and executes customer-facing
+  actions without human review of each step.
+- **ServiceNow Now Assist** diagnoses IT tickets, looks up configuration items,
+  and triggers remediation workflows.
+- **Google Workspace Gemini** drafts, schedules, and sends on behalf of users.
+- **AWS Bedrock Agents, Azure AI Foundry** — cloud-native agent orchestration
+  available to any development team as a managed service.
+
+Every model lab from Anthropic, OpenAI, Google, and Meta now ships tool-calling
+as a core feature, not an add-on. MCP was proposed in late 2024 and adopted by
+major platforms within months. The ecosystem moved fast.
+
+**The security discipline has not kept pace.** Most enterprise security teams
+are still applying web-application threat models to systems where the decision
+maker is no longer deterministic code — it is a statistical model that reads
+everything in its context window as a potential instruction. The four attacks in
+Lab 4 are not theoretical. They are applicable today to systems that are already
+in production in most large organisations.
+
+---
+
 ## Why classical security misses agentic attacks
 
 Classic enterprise security assumes deterministic systems. A firewall rule, an
@@ -372,3 +429,37 @@ validate what it returns.
 | `TRANSPARENCY` | `quiet` | UI shows only final answer; internal log still written |
 | `POISON_DESC` | `true` | `search_web` description contains hidden exfiltration instructions |
 | `ENABLE_EXTRA_TOOL` | `true` | Required to expose `search_web` (prerequisite for `POISON_DESC`) |
+
+---
+
+## Summary: the security posture shift
+
+The central change agentic AI introduces is not a new vulnerability class — SQL
+injection, data exfiltration, and prompt injection all existed before LLMs. The
+change is **who decides what runs**.
+
+In a conventional application, the code decides. In an agentic system, the model
+decides — based on whatever text is in the context window at that moment. Any
+text in the context window is a potential instruction source. That includes user
+input, tool results, retrieved documents, and MCP tool descriptions.
+
+This makes the threat model fundamentally different:
+
+| Conventional app | Agentic system |
+|-----------------|----------------|
+| Code decides what queries to run | Model decides, based on context |
+| Injection exploits the parser | Injection exploits the statistical predictor |
+| Patch the input handling | No clean patch — the model is the handler |
+| Audit log records what code did | Audit log must record what the model decided |
+| Access control enforced in code | Access control must be enforced outside the model |
+
+The appropriate response is not to avoid agentic systems — they deliver genuine
+value and the industry has already adopted them at scale. The appropriate
+response is to treat the model as an untrusted component: validate what it
+decides to do before doing it, log everything independently of the model's
+output, and enforce authorization at the tool layer in code rather than
+trusting system prompt constraints.
+
+That is the architecture Module 2 pointed toward and Module 4 demonstrated. Lab 4
+continues into the [FortiAIGate Workshop](https://fortinetcloudcse.github.io/faig-training-workshop/)
+where those controls are applied in front of a real production system.

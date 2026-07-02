@@ -37,6 +37,27 @@ weight: 90
 | `/logs` | GET | Full audit log (all events, regardless of TRANSPARENCY setting). |
 | `/outbox` | GET | Messages queued by `send_message`. |
 
+## OpenAI-compatible API
+
+The agent uses the OpenAI chat completions API format — `POST /v1/chat/completions`
+with the message list, model name, and sampling parameters. This is **not**
+exclusive to OpenAI. It has become a de-facto open standard:
+
+| Service | Endpoint style |
+|---------|---------------|
+| Ollama (Day 1) | `http://localhost:11434/v1` |
+| FortiAIGate (Day 2) | `https://<host>/v1` |
+| OpenAI | `https://api.openai.com/v1` |
+| AWS Bedrock (converse API) | Compatible via proxy |
+| vLLM, LM Studio, Groq, Azure OpenAI | Compatible |
+
+This is why swapping from Ollama to FortiAIGate or any other provider requires
+changing only `OPENAI_BASE_URL` — the request format, the response parsing, and
+the agent loop are identical. The model name (`MODEL`) may also need to change
+to match what the target endpoint serves.
+
+---
+
 ## Day 2 swap — one-line change
 
 **Docker Compose:**
@@ -88,6 +109,8 @@ Ensure you have Docker Compose v2 (`docker compose` with a space, not
 
 | Term | Definition |
 |------|------------|
+| Agent | A specific software system: an LLM + a loop + a set of tools. Identifiable in code. The FastAPI container in this workshop is an agent. |
+| Agentic | An adjective describing any system where an LLM drives decisions that cause code to execute or data to move — regardless of whether the word "agent" appears in its name. A copilot, automation tool, or RAG pipeline with write-back can all be agentic. The agentic security model applies to all of them. |
 | Prompt injection | An attack where crafted input causes an LLM to ignore or override its original instructions. |
 | Tool / function calling | The mechanism by which an LLM signals that it wants code to run a function on its behalf. The model emits structured JSON; your code executes the function. |
 | Confused deputy | A security problem where a system with legitimate access to a resource is tricked into using that access on behalf of an attacker. |

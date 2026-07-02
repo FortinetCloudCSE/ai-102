@@ -18,6 +18,24 @@ By the end of this page you should be able to explain:
 
 ---
 
+## The UI
+
+Lab 2 introduces a browser UI at [http://localhost:8080](http://localhost:8080)
+served by an nginx container. It is a single-page vanilla JS application that
+talks to the agent at `http://localhost:8001` (proxied through nginx as `/api/`).
+
+It has three panels:
+- **Chat** — sends messages to `/chat`, displays the agent's final answer.
+- **Trace** — shows each tool call in real time: function name, arguments, and
+  result. Populated from the `trace` array in the `/chat` response.
+- **Audit Log** — shows the structured log from `/logs`. Visible only when
+  `TRANSPARENCY=verbose`; empty under `quiet` mode. This is the Lab 4 lesson.
+
+The UI is a teaching aid. All the same interactions are available via `curl`
+against the agent API directly — which is how the lab verification steps work.
+
+---
+
 ## What an agent actually is
 
 The word "agent" gets used to describe everything from a simple chatbot wrapper
@@ -41,6 +59,35 @@ implements this in about 40 lines of Python. The reason we build it without
 LangChain or any similar framework is that frameworks hide the loop — and once
 you understand the loop, you understand both how agents work and exactly where
 they can go wrong.
+
+### Agent vs agentic — a distinction that matters
+
+These two terms are often used interchangeably but mean different things:
+
+**Agent** refers to a specific, identifiable software system: a loop, an LLM,
+and a set of tools. You can point at it in code. The container in this workshop
+is an agent.
+
+**Agentic** is an adjective that describes any system where an LLM drives
+decisions and real-world actions — to any degree. An agent is always agentic.
+But many systems are agentic without being called agents:
+
+| System | Why it is agentic |
+|--------|------------------|
+| GitHub Copilot Workspace | LLM decides which files to edit and what code to write |
+| An email assistant | LLM reads incoming mail and drafts or sends replies |
+| A RAG pipeline with write-back | LLM retrieves content and the result updates a record |
+| An IT automation copilot | LLM interprets a ticket and calls infrastructure APIs |
+| This workshop's FastAPI container | LLM calls `query_employees` and `send_message` |
+
+The distinction matters for security. A product team may say "we don't have an
+agent" while running a system where an LLM is driving tool calls. The question
+is not whether the word "agent" appears in the architecture diagram — it is
+whether an LLM is making decisions that cause code to execute or data to move.
+If yes, the agentic security model applies.
+
+Module 4 covers agentic security: the attack surface and failure modes that
+apply to all of these systems, not just bare agent loops.
 
 ---
 
@@ -284,6 +331,36 @@ decided to do — is the entire subject of Module 4.
 ---
 
 ## Quick reference
+
+### `/chat` response and trace format
+
+```json
+{
+  "answer": "Alice Chen's manager is Bob.",
+  "session_id": "abc123",
+  "trace": [
+    {
+      "iteration": 0,
+      "tool_calls": [
+        {
+          "tool": "query_employees",
+          "arguments": { "filter": "Engineering" },
+          "result": "{\"employees\": [{\"name\": \"Alice Chen\", ...}]}"
+        }
+      ]
+    },
+    {
+      "iteration": 1,
+      "answer": "Alice Chen's manager is Bob."
+    }
+  ]
+}
+```
+
+Each element in `trace` is one iteration of the loop. A tool-call iteration
+has `tool_calls` (list of name + arguments + raw result string). The final
+iteration has `answer` instead. If `MAX_ITERATIONS` is reached, `answer` is
+`"Reached iteration limit."` and the trace has no final answer entry.
 
 ### Agent loop state machine
 

@@ -230,6 +230,10 @@ complicates the agent loop (you must accumulate chunks before parsing
 }
 ```
 
+`choices` is an array because the API supports requesting `n > 1` completions
+in a single call (useful for sampling multiple candidates). This workshop always
+uses the default `n=1`, so `choices[0]` is the only entry.
+
 The fields you will access most often:
 
 - **`choices[0].message.content`** — the model's text reply.
@@ -523,3 +527,33 @@ Modules 2 through 4 build toward exactly that design.
 | Architecture | Transformer decoder (causal LM) |
 | Quantization in this workshop | Q4_K_M — 4-bit weights, runs on CPU |
 | API | OpenAI-compatible `/v1/chat/completions` |
+
+### Quantization
+
+Transformer models are trained with 16- or 32-bit floating point weights.
+Running them at full precision requires significant memory — a 3B-parameter
+model in bfloat16 needs roughly 6 GB of RAM just for the weights, before any
+activations. **Quantization** reduces the bit-width of the weights after
+training, trading a small amount of accuracy for a large reduction in memory
+and compute.
+
+The format Ollama uses is **GGUF** (developed by the llama.cpp project). Inside
+GGUF, the precision level is encoded in the filename:
+
+| Suffix | Bits per weight | Approx size (3B model) | Notes |
+|--------|----------------|----------------------|-------|
+| Q2_K | ~2.6 | ~1.1 GB | Smallest; noticeable quality loss |
+| Q4_K_M | ~4.5 | ~2.0 GB | Good balance; default in this workshop |
+| Q8_0 | 8 | ~3.3 GB | Near full quality; still fits in CPU RAM |
+| F16 | 16 | ~6.0 GB | Full training precision |
+
+The `K` suffix means k-means-based quantization (groups of weights are
+approximated together rather than independently, which preserves quality
+better than naive rounding). `M` means the medium variant of that scheme —
+a balance between the `S` (small, faster) and `L` (large, higher quality)
+options.
+
+For this workshop, Q4_K_M means the model runs comfortably on a laptop CPU
+with 8 GB of free RAM, at a quality level that is adequate for the lab
+scenarios. For production use with more demanding tasks, Q8_0 or larger models
+are typical.
