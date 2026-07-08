@@ -94,7 +94,18 @@ async def lifespan(_app: FastAPI):
     if TOOL_MODE == "hardcoded":
         _load_hardcoded()
     elif TOOL_MODE == "mcp":
-        await _discover_mcp()
+        import asyncio
+        for attempt in range(10):
+            try:
+                await _discover_mcp()
+                break
+            except Exception as exc:
+                if attempt == 9:
+                    raise
+                wait = 2 ** attempt
+                audit.emit({"event": "mcp_connect_retry", "attempt": attempt + 1,
+                            "wait_s": wait, "error": str(exc)}, True)
+                await asyncio.sleep(wait)
     else:
         raise ValueError(f"Unknown TOOL_MODE: {TOOL_MODE!r}")
     yield
