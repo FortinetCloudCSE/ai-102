@@ -130,6 +130,11 @@ curl -s http://localhost:8001/outbox | jq '.messages'
 {{% /tab %}}
 {{< /tabs >}}
 
+{{% notice style="warning" title="Output may vary" %}}
+LLM responses are non-deterministic, so exact wording and behavior can differ
+between runs — even with identical prompts and inputs.
+{{% /notice %}}
+
 
 {{% notice style="tip" title="If the model narrates instead of acting" %}}
 Small models occasionally describe what they *would* do ("I would send a message
@@ -210,10 +215,20 @@ You should now be able to:
 - Trigger a single tool call, a chained call, and a no-tool response.
 - Find the loop code and identify each branch.
 
+
+{{< tabs >}}
+{{% tab title="Verify"%}}
 ```bash
 curl -s http://localhost:8001/health | jq '.tool_mode'
-# Expected: "hardcoded"
 ```
+{{% /tab %}}
+{{% tab title="Expected Output" style="info" %}}
+```
+"hardcoded"
+```
+{{% /tab %}}
+{{< /tabs >}}
+
 
 {{% notice style="info" title="Optional: FortiAIGate extension" %}}
 FortiAIGate sits between the agent and the LLM and sees every request,
