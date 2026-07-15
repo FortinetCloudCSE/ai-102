@@ -104,11 +104,11 @@ This requires two tool calls the model cannot batch into one turn:
 
 - Watch the Trace panel show both steps:
 
- ![tracepanel](../../images/tracepanel.png)
+ ![tracepanel](./tracepanel.png)
 
 - Then confirm the outbox received the message:
 
- ![outbox](../../images/outbox.png)
+ ![outbox](./outbox.png)
 
 - Now from the terminal run the following:
 
